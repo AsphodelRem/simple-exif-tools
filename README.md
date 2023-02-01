@@ -5,21 +5,35 @@ Including a little console programm to use it.
 
 There are some images for testing.
 
-# Highligths:
+## Highligths:
 * C99
-* Compliling only with 32-bit version of compliler
+* Compliling only with 32-bit version of compliler.
 
-# TO-DO:
-* Removing specific tags
-* Addition new tags
-* Graphical interface
-* RIFF (Wav) supporting
+## TO-DO:
+* Removing specific tags.
+* Addition new tags.
+* Graphical interface.
+* RIFF (Wav) supporting.
 
-# API
+## Usage
+``` cpp
+ExifMetadata* exifMd = initIFDTables(buffer);
+if (exifMd != NULL)
+{
+	parseIFDs(exifMd);
+	saveMetadataInTXT(exifMd, "file-with-metadata.txt");
+	removeEXIFFromJPEG(exifMd, "NewImageName.jpg");
+	freeIFDTables(exifMd);
+}
+```
 
-## Structures
+You can find one more example in tiny-app folder.
 
-### Main structure
+## API
+
+### Structures
+
+#### Main structure
 
 ExifMetadata is a structure used to store the parsed EXIF metadata from a JPEG file. The EXIF metadata is organized into different IFD (Image File Directory) tables, each containing different types of metadata tags. It contains all information you need.
 
@@ -62,28 +76,40 @@ It contains standard EXIF tag structure.
 * count - number of values
 * ptr - value or offset to tags' value
 
-## Functions
+### Functions
 
+#### Initializing structure
 To get started, you need to initialize a ```ExifMetadata``` structure
 ``` cpp
 ExifMetadata* initIFDTables(const char* fileName);
 ```
 
-This function is used to free allocated memory for ExifMetadata structure
+#### Filling main structure
+After initializing structure, you should fill its values.
+This function fills ```ExifMetadata``` structure with founded data.
+``` cpp
+parseIFDs(ExifMetadata* metadata);
+```
+
+#### Deleting main structure
+This function is used to free allocated memory for ```ExifMetadata``` structure
 ``` cpp
 int freeIFDTables(ExifMetadata* metadata);
 ```
 
-This function is used for removing ALL metadata from your image. 
+#### Removing metadata
+This function is used for removing ***ALL*** metadata from your image. 
 When it works, it creates a new image with name ```newImageName``` contains the same data but without exif table.
-If ``` cpp newImageName``` is NULL, creates a file with an old name with "No_Exif_" tag.
+
+**NOTE:** If ``` cpp newImageName``` is NULL, creates a file with an old name with "No_Exif_" tag.
 ``` cpp
 int removeEXIFFromJPEG(ExifMetadata* metadata, const char* newImageName);
 ```
 
+#### Printing metadata
 Print metadata in given stream.
 if mode == STD_STREAM_MODE, it calls ```printMetadata```, which print metadata in stdout.
-In case mode == TXT_STREAM_MODE, it calls ``` cpp saveMetadataInTXT``, which creates new file and saves the data in it.
+In case mode == TXT_STREAM_MODE, it calls ```saveMetadataInTXT``, which creates new file and saves the data in it.
 ``` cpp
 int printMetadataIntoStream(ExifMetadata* metadata, const char* txtFileName, int mode);
 ```
@@ -100,14 +126,13 @@ void printMetadata(ExifMetadata* metadata);
 
 Save metadata in txt file with ```txtFileName``` name.
 ``` cpp
-// Printing a founded metadata in 'txtFileName' file
 void saveMetadataInTXT(ExifMetadata* metadata, const char* txtFileName);
 ```
 
+#### Additional functions
 If some value is array containing a lot of elements, its data can take up most of the screen, which is not very convenient.
 This two functions are used to limit/unlimin maximal length of output data.
 ``` cpp
-// Limiting length of string data
 void limitOutputLength();
 
 void unlimitOutlutLength();
