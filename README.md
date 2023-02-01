@@ -64,7 +64,7 @@ It contains standard EXIF tag structure.
 
 ## Functions
 
-To get started, you need to initialize a ```cpp ExifMetadata``` structure
+To get started, you need to initialize a ```ExifMetadata``` structure
 ``` cpp
 ExifMetadata* initIFDTables(const char* fileName);
 ```
@@ -75,14 +75,14 @@ int freeIFDTables(ExifMetadata* metadata);
 ```
 
 This function is used for removing ALL metadata from your image. 
-When it works, it creates a new image with name ```cpp newImageName``` contains the same data but without exif table.
+When it works, it creates a new image with name ```newImageName``` contains the same data but without exif table.
 If ``` cpp newImageName``` is NULL, creates a file with an old name with "No_Exif_" tag.
 ``` cpp
 int removeEXIFFromJPEG(ExifMetadata* metadata, const char* newImageName);
 ```
 
 Print metadata in given stream.
-if mode == STD_STREAM_MODE, it calls ```cpp printMetadata```, which print metadata in stdout.
+if mode == STD_STREAM_MODE, it calls ```printMetadata```, which print metadata in stdout.
 In case mode == TXT_STREAM_MODE, it calls ``` cpp saveMetadataInTXT``, which creates new file and saves the data in it.
 ``` cpp
 int printMetadataIntoStream(ExifMetadata* metadata, const char* txtFileName, int mode);
@@ -98,7 +98,7 @@ Print metadata into stdout
 void printMetadata(ExifMetadata* metadata);
 ```
 
-Save metadata in txt file with ```cpp txtFileName``` name.
+Save metadata in txt file with ```txtFileName``` name.
 ``` cpp
 // Printing a founded metadata in 'txtFileName' file
 void saveMetadataInTXT(ExifMetadata* metadata, const char* txtFileName);
