@@ -1,0 +1,14 @@
+/Debug
+/.vs
+/x64
+/x32
+/removeEXIF/Debug
+/removeEXIF/x64
+/removeEXIF/x32
+/tiny-app/Debug
+/tiny-app/Release
+/tiny-app/tiny-app.vcxproj.user
+/removeEXIF/removeEXIF.vcxproj.user
+/removeEXIF/Release
+/interface
+/.git
