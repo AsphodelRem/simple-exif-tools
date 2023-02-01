@@ -469,7 +469,7 @@ static int setTagsNames(ExifMetadata* metadata)
 			LONG tag = currentIFDTable->tags[j].tag;
 			LONG type = currentIFDTable->tags[j].type;
 
-			//choosing a tag of a value
+			//Сhoosing a tag of a value
 			switch (tag)
 			{
 			case(ImageWidth):					tagName = "ImageWigth";					break;
