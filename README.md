@@ -1,4 +1,4 @@
-# IA-EXIF library
+# AUDIO-IMAGE-EXIF library
 
 Simple library for detecting and removing exif metadata from .jpeg image.
 Including a little console programm to use it.
