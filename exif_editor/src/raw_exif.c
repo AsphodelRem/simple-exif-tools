@@ -2,11 +2,10 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#include <raw_exif.h>
 #include <exif.h>
+#include <raw_exif.h>
 
-static void swabBytes(LONG count, ...)
-{
+void swabBytes(LONG count, ...) {
 	SHORT* short_v;
 	SSHORT* sshort_v;
 	LONG* long_v;
@@ -40,21 +39,55 @@ static void swabBytes(LONG count, ...)
 	va_end(list);
 }
 
-static int setEndianess(APP1Header* app1_header)
-{
-	if (!app1_header) return HEADER_ERROR;
+int isBigEndian(APP1Header* app1_header) {
+	if (!app1_header) {
+		return HEADER_ERROR;
+	}
 
-	if (app1_header->tiff_header.byte_order == L_ENDIAN)
-		isBigEndian = 0;
-	else if (app1_header->tiff_header.byte_order == B_ENDIAN)
-		isBigEndian = 1;
-	else return HEADER_ERROR;
+	if (app1_header->tiff_header.byte_order == L_ENDIAN) {
+		return 0;
+	}
 
-	return EXIF_SUCCESS;
+	if (app1_header->tiff_header.byte_order == B_ENDIAN) {
+		return 1;
+	}
+}
+
+int getTypeSize(int type) {
+	switch (type)
+	{
+	case(TYPE_BYTE):
+	case(TYPE_SBYTE):
+		return sizeof(BYTE);
+		break;
+
+	case(TYPE_SHORT):
+	case(TYPE_SSHORT):
+		return sizeof(SHORT);
+		break;
+
+	case(TYPE_LONG):
+	case(TYPE_SLONG):
+		return sizeof(LONG);
+		break;
+
+	case(TYPE_RATIONAL):
+	case(TYPE_SRATIONAL):
+		return sizeof(RATIONAL);
+		break;
+
+	case(TYPE_ASCII):
+	case(TYPE_UNDEFINED):
+		return sizeof(char);
+		break;
+
+	default:
+		return 0;
+	}
 }
 
 // Creates App1 Header structure
-APP1Header* createApp1Header() {
+static APP1Header* createApp1Header() {
 	APP1Header* new_app1_header = (APP1Header*)calloc(1, sizeof(APP1Header));
 	if (!new_app1_header) {
 		return NULL;
@@ -62,8 +95,7 @@ APP1Header* createApp1Header() {
 	return new_app1_header;
 }
 
-EXIF_STATUS checkSOIMarker(FILE* image)
-{
+static EXIF_STATUS checkSOIMarker(FILE* image) {
     SHORT SOI_marker;
 
     fseek(image, 0, SEEK_SET);
@@ -73,8 +105,7 @@ EXIF_STATUS checkSOIMarker(FILE* image)
     else return HEADER_ERROR;
 }
 
-static int searchForAPP1Marker(FILE* image)
-{
+static int searchForAPP1Marker(FILE* image) {
 	SHORT buf;
 	int offset = 1;
 	while (fread(&buf, sizeof(buf), 1, image))
@@ -86,32 +117,33 @@ static int searchForAPP1Marker(FILE* image)
 }
 
 // Reads app1 header
-EXIF_STATUS readApp1Header(FILE* image, APP1Header* header) {
+static EXIF_STATUS readApp1Header(FILE* image, APP1Header* header) {
     // Check for the SOI marker
-    if (!checkSOIMarker(image))
-        return NOT_JPEG_ERROR;
+    if (!checkSOIMarker(image)) {
+			return NOT_JPEG_ERROR;
+		}
 
     // Search for the offset of the app1 structure
     int offset = searchForAPP1Marker(image);
     if (offset == -1) {
-        return APP1_MARKER_NOT_FOUND_ERROR;
+			return APP1_MARKER_NOT_FOUND_ERROR;
     }
 
     fseek(image, offset, SEEK_SET);
     fread(header, SIZE_OF_DEFAULT_HEADER, 1, image);
-    setEndianess(header);
+
+		int is_big_endian = isBigEndian(header);
 
     // Swap the bytes of the count variable
     swabBytes(1, TYPE_SHORT, &header->count);
 
-    if (isBigEndian)
-    {
-        // Swap the bytes of the marker, Ifd0thOffset, and reserved variables
-        swabBytes(3, TYPE_SHORT, &header->marker,
-            TYPE_LONG, &header->tiff_header.ifd_0th_offset, TYPE_SHORT, &header->tiff_header.reserved);
+    if (is_big_endian) {
+			// Swap the bytes of the marker, Ifd0thOffset, and reserved variables
+			swabBytes(3, TYPE_SHORT, &header->marker,
+					TYPE_LONG, &header->tiff_header.ifd_0th_offset, TYPE_SHORT, &header->tiff_header.reserved);
     }
 
-     return offset;
+		return offset;
 }
 
 // Free app1 header
@@ -122,7 +154,7 @@ void freeApp1Header(APP1Header* header) {
 }
 
 // Creates raw IFD array
-RawIFDArray* createInternalIFDArray() {
+static RawIFDArray* createRawIfdArray() {
 	RawIFDArray* new_array = (RawIFDArray*)calloc(1, sizeof(RawIFDArray));
 
 	if (!new_array) {
@@ -133,7 +165,7 @@ RawIFDArray* createInternalIFDArray() {
 }
 
 // Read raw ifd array
-EXIF_STATUS fillInternalIfdArray(FILE* image, RawIFDArray* array) {
+static EXIF_STATUS fillRawIfdArray(FILE* image, RawIFDArray* array, int is_big_endian) {
 	if (!image) {
 		return NO_FILE_ERROR;
 	}
@@ -141,7 +173,7 @@ EXIF_STATUS fillInternalIfdArray(FILE* image, RawIFDArray* array) {
 	SHORT num_of_tags;
 	fread(&num_of_tags, sizeof(num_of_tags), 1, image);
 
-	if (isBigEndian) {
+	if (is_big_endian) {
 		swabBytes(1, TYPE_SHORT, &num_of_tags);
 	}
 
@@ -152,7 +184,7 @@ EXIF_STATUS fillInternalIfdArray(FILE* image, RawIFDArray* array) {
 		fread(array->tags, sizeof(Tag), num_of_tags, image);
 	}
 
-	if (isBigEndian) {
+	if (is_big_endian) {
 		for (size_t i = 0; i < num_of_tags; i++) {
 			swabBytes(8, TYPE_LONG, &array->tags[i].count, TYPE_LONG, &array->tags[i].ptr,
 				TYPE_SHORT, &array->tags[i].tag, TYPE_SHORT, &array->tags[i].type);
@@ -165,23 +197,24 @@ EXIF_STATUS fillInternalIfdArray(FILE* image, RawIFDArray* array) {
 }
 
 // Free raw ifd array
-void freeRawIfdArray(RawIFDArray* array) {
-	if (array) {
-		if (array->tags_names) {
-			for (int i = 0; i < array->number_of_tags; i++) {
-				if (array->tags_names[i]) {
-					free(array->tags_names[i]);
-				}
+static void freeRawIfdArray(RawIFDArray* array) {
+	if (!array) {
+		return;
+	}
+	
+	if (array->tags_names) {
+		for (int i = 0; i < array->number_of_tags; i++) {
+			if (array->tags_names[i]) {
+				free(array->tags_names[i]);
 			}
 		}
-		
 		free(array->tags);
 		free(array);
 	}
 }
 
 // Creates raw EXIF table
-RawEXIFTable* createInternalEXIFTable() {
+RawEXIFTable* createRawExifTable() {
 	RawEXIFTable* new_table = (RawEXIFTable*)malloc(sizeof(RawEXIFTable));
 
 	if (!new_table) {
@@ -191,14 +224,14 @@ RawEXIFTable* createInternalEXIFTable() {
 	new_table->app1_header = createApp1Header();
 
 	RawIFDArray** ptr_to_ifd_arrays = (RawIFDArray*)new_table;
-	for (int i = 0; i < MAX_IFD_TBL_NUM; i++) {
-		ptr_to_ifd_arrays[i] = createInternalIFDArray();
+	for (int i = 0; i < NUMBER_OF_IFD_TABLES; i++) {
+		ptr_to_ifd_arrays[i] = createRawIfdArray();
 	}
 
 	return new_table;
 }
 
-int findTagInIfdArray(RawIFDArray* array, LONG tag) {
+static int findTagInIfdArray(RawIFDArray* array, LONG tag) {
 	if (!array) {
 		return NO_IFD_TABLE_ERROR;
 	}
@@ -213,7 +246,7 @@ int findTagInIfdArray(RawIFDArray* array, LONG tag) {
 }
 
 // Fill raw EXIF table
-EXIF_STATUS fillInternalExifTable(char* file_name, RawEXIFTable* table) {
+EXIF_STATUS fillRawExifTable(char* file_name, RawEXIFTable* table) {
 	FILE* image = fopen(file_name, "rb");
 
 	if (!image) {
@@ -221,9 +254,10 @@ EXIF_STATUS fillInternalExifTable(char* file_name, RawEXIFTable* table) {
 	}
 
 	table->app1_start_offset = readApp1Header(image, table->app1_header);
+	int is_big_endian = isBigEndian(table->app1_header);
 
 	fseek(image, SIZE_OF_DEFAULT_HEADER + table->app1_start_offset, SEEK_SET);
-	fillInternalIfdArray(image, table->IFD0thTags);
+	fillRawIfdArray(image, table->IFD0thTags, is_big_endian);
 
 	//Find offsets to next structures.
 	LONG inter_table_offset = findTagInIfdArray(table->IFD0thTags, InteroperabilityIFDPointer);
@@ -233,7 +267,8 @@ EXIF_STATUS fillInternalExifTable(char* file_name, RawEXIFTable* table) {
 	//Read an offset to the next IFD table if it exists.
 	LONG IFD1st_table_offset = 0;
 	fread(&IFD1st_table_offset, sizeof(IFD1st_table_offset), 1, image);
-	if (isBigEndian) {
+
+	if (is_big_endian) {
 		swabBytes(1, TYPE_LONG, &IFD1st_table_offset);
 	}
 
@@ -241,22 +276,22 @@ EXIF_STATUS fillInternalExifTable(char* file_name, RawEXIFTable* table) {
 
 	if (inter_table_offset) {
 		fseek(image, start_offset + inter_table_offset, SEEK_SET);
-		fillInternalIfdArray(image, table->InterTags);
+		fillRawIfdArray(image, table->InterTags, is_big_endian);
 	}
 
 	if (exif_table_offset) {
 		fseek(image, start_offset + exif_table_offset, SEEK_SET);
-		fillInternalIfdArray(image, table->ExifTags);
+		fillRawIfdArray(image, table->ExifTags, is_big_endian);
 	}
 
 	if (GPS_table_offset) {
 		fseek(image, start_offset + GPS_table_offset, SEEK_SET);
-		fillInternalIfdArray(image, table->GPSTags);
+		fillRawIfdArray(image, table->GPSTags, is_big_endian);
 	}
 
 	if (IFD1st_table_offset) {
 		fseek(image, start_offset + IFD1st_table_offset, SEEK_SET);
-		fillInternalIfdArray(image, table->IFD1stTags);
+		fillRawIfdArray(image, table->IFD1stTags, is_big_endian);
 	}
 
 	fclose(image);
@@ -264,16 +299,18 @@ EXIF_STATUS fillInternalExifTable(char* file_name, RawEXIFTable* table) {
 	return EXIF_SUCCESS;
 }
 
-// Free internal EXIF Table
+// Free raw EXIF Table
 void freeRawExifTable(RawEXIFTable* table) {
-	if (table) {
-		freeApp1Header(table->app1_header);
-
-		RawIFDArray** ptr_to_ifd_arrays = (RawIFDArray*)table;
-		for (int i = 0; i < MAX_IFD_TBL_NUM; i++) {
-			freeRawIfdArray(ptr_to_ifd_arrays[i]);
-		}
-
-		free(table);
+	if (!table) {
+		return;
 	}
+
+	freeApp1Header(table->app1_header);
+
+	RawIFDArray** ptr_to_ifd_arrays = (RawIFDArray*)table;
+	for (int i = 0; i < NUMBER_OF_IFD_TABLES; i++) {
+		freeRawIfdArray(ptr_to_ifd_arrays[i]);
+	}
+
+	free(table);
 }
