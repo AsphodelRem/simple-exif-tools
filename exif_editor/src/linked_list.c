@@ -1,21 +1,23 @@
 #include <stdlib.h>
 #include <memory.h>
 
-#include "linked_list.h"
+#include <linked_list.h>
 
 Node* createNode(void* value, unsigned int length, unsigned int tag_name)
 {
-	if (length == 0 || value == NULL) {
+	if (length == 0) {
 		return NULL;
 	}
 
 	Node* new_node = (Node*)calloc(1, sizeof(Node));
-
 	new_node->value = (void*)calloc(length, 1);
 	new_node->length = length;
 	new_node->tag_name = tag_name;
 	new_node->next = NULL;
-	memcpy(new_node->value, value, length);
+
+	if (value != NULL) {
+		memcpy(new_node->value, value, length);
+	}
 
 	return new_node;
 }
@@ -102,7 +104,6 @@ void removeNode(List* list, unsigned int index) {
 }
 
 Node* findNode(List* list, unsigned int tag_name) {
-	
 	Node* iter = list->head;
 	while (iter != NULL) {
 		if (iter->tag_name == tag_name) {
@@ -113,5 +114,3 @@ Node* findNode(List* list, unsigned int tag_name) {
 
 	return NULL;
 }
-
-
