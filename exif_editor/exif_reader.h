@@ -11,3 +11,5 @@ typedef struct ExifMetadata_s {
 ExifMetadata *getExifMetadata(char* file_name);
 
 void freeExifMetadata(ExifMetadata *metadata);
+
+void printMetadataIntoStream(ExifMetadata* metadata, char* file_name, int mode);

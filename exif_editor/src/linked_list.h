@@ -2,9 +2,11 @@
 
 typedef struct Node_s {
 	struct Node* next;
-	void* value;
+	char* value;
 	unsigned int length;
 	unsigned int tag_name;
+	
+	int _tag_type;
 } Node;
 
 typedef struct List_s {
