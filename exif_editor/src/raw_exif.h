@@ -1,26 +1,26 @@
 #pragma once
 
-#define JPEG_SOI_TAG						0xD8FF
-#define EXIF_TAG								0xFFE1
+#define JPEG_SOI_TAG				0xD8FF
+#define EXIF_TAG					0xFFE1
 
-#define INTEL										0x4949
-#define L_ENDIAN								INTEL
-#define MOTOROLLA								0x4D4D
-#define B_ENDIAN								MOTOROLLA
+#define INTEL						0x4949
+#define L_ENDIAN					INTEL
+#define MOTOROLLA					0x4D4D
+#define B_ENDIAN					MOTOROLLA
 
 #define SIZE_OF_SOI_MARKER			2
 #define SIZE_OF_APP1_MARKER			2
-#define SIZE_OF_DEFAULT_HEADER	18
+#define SIZE_OF_DEFAULT_HEADER		18
 #define SIZE_OF_TIFF_HEADER			12
 
-typedef unsigned char						BYTE;
-typedef char										SBYTE;
-typedef unsigned short					SHORT;
-typedef short										SSHORT;
-typedef unsigned int						LONG;
-typedef int											SLONG;
-typedef char*										UNDEFINED;
-typedef char*										ASCII;
+typedef unsigned char				BYTE;
+typedef char						SBYTE;
+typedef unsigned short				SHORT;
+typedef short						SSHORT;
+typedef unsigned int				LONG;
+typedef int							SLONG;
+typedef char*						UNDEFINED;
+typedef char*						ASCII;
 
 typedef struct RATIONAL_s {
 	LONG nominator;
