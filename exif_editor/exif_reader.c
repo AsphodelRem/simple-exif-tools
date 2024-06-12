@@ -335,7 +335,7 @@ static void printMetadataIntoStream(ExifMetadata* metadata, char* file_name) {
             case(TYPE_LONG):
                 longPtr = (LONG*)curr_ptr;
                 for (size_t x = 0; x < count; x++)
-                    printf("%I32d ", longPtr[x]);
+                    printf("%u ", longPtr[x]);
                 printf("%s", "\n");
                 break;
 
