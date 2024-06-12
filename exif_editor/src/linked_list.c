@@ -1,21 +1,33 @@
 #include <stdlib.h>
 #include <memory.h>
+#include <string.h>
 
 #include <linked_list.h>
 
-Node* createNode(void* value, unsigned int length, unsigned int tag_name)
+Node* createNode(void* value, unsigned int length, char* tag_name)
 {
 	if (length == 0) {
 		return NULL;
 	}
 
 	Node* new_node = (Node*)calloc(1, sizeof(Node));
-	new_node->value = (void*)calloc(length, 1);
-	new_node->length = length;
-	new_node->tag_name = tag_name;
-	new_node->next = NULL;
 
-	if (value != NULL) {
+	// Avoiding NULL pointer dereferencing
+	if (new_node == NULL) {
+		return NULL;
+	}
+
+	new_node->value			= (void*)calloc(length, 1);
+	new_node->length		= length;
+	int tag_name_length		= strlen(tag_name) + 1;
+	new_node->tag_name		= (char*)calloc(tag_name_length, sizeof(char));
+	new_node->next			= NULL;
+
+	if (new_node->tag_name != NULL) {
+		strncpy(new_node->tag_name, tag_name, tag_name_length);
+	}
+
+	if (value != NULL && new_node->value) {
 		memcpy(new_node->value, value, length);
 	}
 
@@ -32,6 +44,11 @@ void deleteNode(Node* node) {
 
 List* createList(unsigned int length) {
 	List* new_list = (List*)calloc(1, sizeof(List));
+
+	// Avoiding NULL pointer dereferencing
+	if (new_list == NULL) {
+		return NULL;
+	}
 
 	new_list->length = 0;
 	new_list->tail = new_list->head;

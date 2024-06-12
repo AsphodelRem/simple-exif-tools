@@ -4,7 +4,7 @@ typedef struct Node_s {
 	struct Node* next;
 	char* value;
 	unsigned int length;
-	unsigned int tag_name;
+	char* tag_name;
 	
 	int _tag_type;
 } Node;
@@ -15,7 +15,7 @@ typedef struct List_s {
 	unsigned int length;
 } List;
 
-Node* createNode(void* value, unsigned int length, unsigned int tag_name);
+Node* createNode(void* value, unsigned int length, char* tag_name);
 
 void deleteNode(Node* node);
 
