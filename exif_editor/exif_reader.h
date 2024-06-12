@@ -12,4 +12,6 @@ ExifMetadata *getExifMetadata(char* file_name);
 
 void freeExifMetadata(ExifMetadata *metadata);
 
-void printMetadataIntoStream(ExifMetadata* metadata, char* file_name, int mode);
+void printMetadata(ExifMetadata* metadata);
+
+void saveMetadata(ExifMetadata* metadata, char* file_name);
