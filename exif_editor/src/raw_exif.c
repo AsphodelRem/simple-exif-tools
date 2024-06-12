@@ -180,14 +180,23 @@ static EXIF_STATUS fillRawIfdArray(FILE* image, RawIFDArray* array, int is_big_e
 	array->number_of_tags = num_of_tags;
 	array->tags = (Tag*)calloc(array->number_of_tags, sizeof(Tag));
 
+	if (array->tags == NULL) {
+		return MEMORY_ALLOCATION_ERROR;
+	}
+
 	if (array->tags != NULL) {
 		fread(array->tags, sizeof(Tag), num_of_tags, image);
 	}
 
 	if (is_big_endian) {
 		for (size_t i = 0; i < num_of_tags; i++) {
-			swabBytes(8, TYPE_LONG, &array->tags[i].count, TYPE_LONG, &array->tags[i].ptr,
-				TYPE_SHORT, &array->tags[i].tag, TYPE_SHORT, &array->tags[i].type);
+			swabBytes(3, TYPE_LONG, &array->tags[i].count, 
+				TYPE_SHORT, &array->tags[i].tag, 
+				TYPE_SHORT, &array->tags[i].type);
+
+			if (array->tags[i].type != TYPE_UNDEFINED) {
+				swabBytes(1, TYPE_LONG, &array->tags[i].ptr);
+			}
 		}
 	}
 
