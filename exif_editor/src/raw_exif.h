@@ -104,10 +104,10 @@ typedef struct InternalIFDArray_s {
 
 typedef struct InternalEXIFData_s {
 	RawIFDArray	*IFD0thTags, 
-							*InterTags, 
-							*GPSTags, 
-							*ExifTags, 
-							*IFD1stTags;
+				*InterTags, 
+				*GPSTags, 
+				*ExifTags, 
+				*IFD1stTags;
 
 	APP1Header* app1_header;
 	int app1_start_offset;
