@@ -1,6 +1,6 @@
-# Simple ExifTool
+# Simple ExifTools
 
-Simple ExifTool is a library for working with EXIF metadata in images. The library allows you to extract, remove and save EXIF metadata from images.
+Simple ExifTools is a library for working with EXIF metadata in images. The library allows you to extract, remove, and save EXIF metadata from images.
 
 ## Features
 
@@ -14,7 +14,7 @@ Simple ExifTool is a library for working with EXIF metadata in images. The libra
 ### Including the Library
 
 ```c
-#include "exif_tool.h"
+#include "exif_tools.h"
 ```
 
 ### API Functions
@@ -23,44 +23,42 @@ Simple ExifTool is a library for working with EXIF metadata in images. The libra
 
 This function extracts EXIF metadata from the specified image file.
 
-**Parameters:**
-- `file_name`: The name of the image file.
-
-**Returns:**
-- A pointer to an `ExifMetadata` structure containing the metadata.
+- **Parameters:**
+  - `file_name`: The name of the image file.
+- **Returns:**
+  - A pointer to an `ExifMetadata` structure containing the metadata.
 
 #### `void freeExifMetadata(ExifMetadata *metadata);`
 
 This function frees the memory allocated for the `ExifMetadata` structure.
 
-**Parameters:**
-- `metadata`: A pointer to the `ExifMetadata` structure.
+- **Parameters:**
+  - `metadata`: A pointer to the `ExifMetadata` structure.
 
 #### `void printMetadata(ExifMetadata* metadata);`
 
 This function prints the EXIF metadata to the console.
 
-**Parameters:**
-- `metadata`: A pointer to the `ExifMetadata` structure.
+- **Parameters:**
+  - `metadata`: A pointer to the `ExifMetadata` structure.
 
 #### `void saveMetadata(ExifMetadata* metadata, char* file_name);`
 
 This function saves the EXIF metadata to the specified file.
 
-**Parameters:**
-- `metadata`: A pointer to the `ExifMetadata` structure.
-- `file_name`: The name of the file to save the metadata to.
+- **Parameters:**
+  - `metadata`: A pointer to the `ExifMetadata` structure.
+  - `file_name`: The name of the file to save the metadata to.
 
 #### `int removeEXIFFromJPEG(char* file_name, char* new_file_name);`
 
 This function removes EXIF metadata from a JPEG image and saves the result to a new file.
 
-**Parameters:**
-- `file_name`: The name of the original JPEG file.
-- `new_file_name`: The name of the new JPEG file without EXIF metadata.
-
-**Returns:**
-- `0` on success, or a non-zero error code on failure.
+- **Parameters:**
+  - `file_name`: The name of the original JPEG file.
+  - `new_file_name`: The name of the new JPEG file without EXIF metadata.
+- **Returns:**
+  - `0` on success, or a non-zero error code on failure.
 
 ### Example Usage
 
