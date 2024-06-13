@@ -8,5 +8,5 @@ add_library(exif_editor_lib
   exif_editor/src/linked_list.c 
   exif_editor/src/raw_exif.c) 
 
-add_executable(exif_editor main.c)
-target_link_libraries(exif_editor exif_editor_lib)
+# add_executable(exif_editor main.c)
+# target_link_libraries(exif_editor exif_editor_lib)
